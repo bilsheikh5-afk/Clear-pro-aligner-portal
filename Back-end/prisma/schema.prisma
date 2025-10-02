@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(ADMIN)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+}
+
+model Doctor {
+  id             Int      @id @default(autoincrement())
+  name           String
+  email          String   @unique
+  passwordHash   String?    // for doctor portal login
+  specialization String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  cases          Case[]
+}
+
+model Patient {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String?  @unique
+  phone        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  cases        Case[]
+}
+
+model Case {
+  id           Int      @id @default(autoincrement())
+  code         String   @unique
+  diagnosis    String?
+  status       CaseStatus @default(PENDING)
+  caseType     String?
+  complexity   String?
+  treatmentDurationMonths Int?
+  previousTreatment String?
+  notes        String?
+  doctor       Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId     Int
+  patient      Patient  @relation(fields: [patientId], references: [id])
+  patientId    Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  files        CaseFile[]
+}
+
+enum CaseStatus {
+  PENDING
+  IN_REVIEW
+  APPROVED
+  REJECTED
+}
+
+model CaseFile {
+  id            Int      @id @default(autoincrement())
+  case          Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId        Int
+  category      String
+  url           String
+  original_name String
+  mime_type     String
+  file_size     Int
+  createdAt     DateTime @default(now())
+}
+
+model Activity {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @default(now())
+  userName  String
+  action    String
+  details   String
+  status    String
+}

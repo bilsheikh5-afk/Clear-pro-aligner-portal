@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Clear Pro Aligner - Admin Dashboard (Connected)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #dbeafe;
+      --secondary: #64748b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --border: #e2e8f0;
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --border-radius: 12px;
+      --shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * { margin:0; padding:0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: var(--dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    /* Login Page */
+    .login-wrapper {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .login-card h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .muted { color: var(--secondary); font-size: .9rem; margin-bottom: 16px; }
+    .input-group { margin-bottom: 14px; }
+    .input-group label { display:block; font-size:.85rem; color: var(--secondary); margin-bottom: 6px; }
+    .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: var(--transition);
+      font-size: .95rem;
+    }
+    .input-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    .btn {
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 12px 18px; background: var(--primary); color: #fff;
+      border: none; border-radius: 10px; cursor: pointer;
+      transition: var(--transition); font-weight: 600;
+    }
+    .btn:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow); }
+    .row { display:flex; align-items:center; justify-content: space-between; gap: 12px; }
+    .error { color: var(--danger); font-size: .9rem; margin-top: 8px; display:none; }
+    .small { font-size:.85rem; color: var(--secondary); }
+    .env {
+      display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items:center; margin-top: 8px;
+      background:#f8fafc; border:1px solid var(--border); border-radius: 10px; padding: 8px 10px;
+    }
+    .env code { font-size:.85rem; }
+    .link { color: var(--primary); text-decoration: none; }
+    /* Dashboard (hidden until logged in) */
+    .dashboard { display:none; min-height: 100vh; }
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white; position: fixed; height: 100vh; z-index: 1000;
+      transition: var(--transition); box-shadow: var(--shadow);
+    }
+    .sidebar-header { padding:24px; border-bottom: 1px solid rgba(255,255,255,.1); display:flex; align-items:center; gap:12px; }
+    .sidebar-header img { height: 40px; filter: brightness(0) invert(1); }
+    .sidebar-header h2 { font-size: 1.25rem; font-weight: 600; }
+    .sidebar-menu { list-style:none; padding: 16px 0; }
+    .sidebar-menu li { margin-bottom: 4px; }
+    .sidebar-menu a { display:flex; align-items:center; padding: 12px 24px; color: rgba(255,255,255,.8); text-decoration: none; transition: var(--transition); font-weight: 500; }
+    .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,.1); color:#fff; border-right: 4px solid #fff; }
+    .sidebar-menu i { margin-right:12px; width:20px; text-align:center; font-size:1.1rem; }
+    .menu-badge { background: rgba(255,255,255,.2); border-radius:20px; padding:2px 8px; font-size:.75rem; margin-left:auto; }
+    .main-content { flex:1; margin-left: var(--sidebar-width); transition: var(--transition); }
+    header { background:#fff; height: var(--header-height); box-shadow: 0 1px 3px rgba(0,0,0,.1);
+      display:flex; align-items:center; justify-content: space-between; padding: 0 30px; position: sticky; top:0; z-index:100; }
+    .header-left { display:flex; align-items:center; gap:20px; }
+    .menu-toggle { display:none; background:none; border:none; font-size:1.5rem; color:var(--dark); cursor:pointer; }
+    .search-bar { position:relative; width:300px; }
+    .search-bar input { width:100%; padding: 10px 15px 10px 40px; border:1px solid var(--border); border-radius: 12px; font-size:.9rem; transition: var(--transition); }
+    .search-bar input:focus { outline:none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    .search-bar i { position:absolute; left:15px; top:50%; transform: translateY(-50%); color: var(--gray); }
+    .header-right { display:flex; align-items:center; gap:20px; }
+    .header-action { position:relative; cursor:pointer; color:var(--secondary); transition: var(--transition); }
+    .header-action:hover { color:var(--primary); }
+    .notification-badge { position:absolute; top:-5px; right:-5px; background: var(--danger); color:#fff; border-radius:50%; width:18px; height:18px; font-size:.7rem; display:flex; align-items:center; justify-content:center; }
+    .user-profile { display:flex; align-items:center; gap:10px; cursor:pointer; }
+    .user-avatar { width:40px; height:40px; border-radius:50%; background: var(--primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:600; }
+    .user-info { display:flex; flex-direction: column; }
+    .user-name { font-weight: 600; font-size: .9rem; }
+    .user-role { font-size: .8rem; color: var(--gray); }
+    .page-content { padding: 30px; }
+    .page-header { display:flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .page-title { font-size: 1.8rem; font-weight: 700; color: var(--dark); }
+    .page-actions { display:flex; gap: 15px; }
+    .stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:24px; margin-bottom:30px; }
+    .stat-card { background:#fff; border-radius:12px; padding:24px; box-shadow: var(--shadow); transition: var(--transition); border-left:4px solid var(--primary); }
+    .stat-card:hover { transform: translateY(-5px); }
+    .stat-header { display:flex; justify-content: space-between; align-items:center; margin-bottom: 15px; }
+    .stat-icon { width:50px; height:50px; border-radius:12px; background: var(--primary-light); color: var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+    .stat-trend { display:flex; align-items:center; gap:5px; font-size:.8rem; font-weight:600; }
+    .trend-up { color: var(--success); }
+    .stat-value { font-size:2rem; font-weight:700; margin-bottom:5px; }
+    .stat-label { color: var(--secondary); font-size:.9rem; }
+    .charts-container { display:grid; grid-template-columns: 2fr 1fr; gap:24px; margin-bottom:30px; }
+    .chart-card { background:#fff; border-radius:12px; padding:24px; box-shadow: var(--shadow); }
+    .chart-header { display:flex; justify-content: space-between; align-items:center; margin-bottom:20px; }
+    .chart-title { font-size:1.2rem; font-weight:600; }
+    .chart-container { position:relative; height:300px; width:100%; }
+    .data-table { background:#fff; border-radius:12px; overflow:hidden; box-shadow: var(--shadow); margin-bottom:30px; }
+    .table-header { display:flex; justify-content: space-between; align-items:center; padding:20px 24px; border-bottom:1px solid var(--border); }
+    .table-title { font-size:1.2rem; font-weight:600; }
+    .table-actions { display:flex; gap:15px; }
+    table { width:100%; border-collapse: collapse; }
+    th { background:#f8fafc; padding:15px 20px; text-align:left; font-weight:600; font-size:.9rem; color: var(--secondary); border-bottom: 1px solid var(--border); }
+    td { padding:15px 20px; border-bottom:1px solid var(--border); font-size:.9rem; }
+    tr:hover { background:#f8fafc; }
+    .status-badge { display:inline-block; padding:5px 10px; border-radius:20px; font-size:.8rem; font-weight:600; }
+    .status-pending { background:#fef3c7; color:#d97706; }
+    .status-in-review { background:#dbeafe; color:#1d4ed8; }
+    .status-approved { background:#d1fae5; color:#065f46; }
+    .status-rejected { background:#fee2e2; color:#991b1b; }
+    @media (max-width:1200px){ .charts-container{ grid-template-columns: 1fr; } }
+    @media (max-width:992px){
+      .sidebar{ transform: translateX(-100%); }
+      .sidebar.active{ transform: translateX(0); }
+      .main-content{ margin-left:0; }
+      .menu-toggle{ display:block; }
+      .search-bar{ width:200px; }
+    }
+    @media (max-width:768px){
+      .stats-grid{ grid-template-columns: 1fr; }
+      .table-header{ flex-direction: column; align-items:flex-start; gap:15px; }
+      .table-actions{ width:100%; justify-content: space-between; }
+      .search-bar{ width:100%; }
+      .header-right{ gap:10px; }
+      .user-info{ display:none; }
+      .page-header{ flex-direction: column; align-items:flex-start; gap:15px; }
+      .page-actions{ width:100%; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOGIN PAGE -->
+  <div id="loginPage" class="login-wrapper">
+    <div class="login-card">
+      <h1>Admin Login</h1>
+      <p class="muted">Sign in to access the Clear Pro Aligner dashboard.</p>
+
+      <div class="env">
+        <code>API_BASE</code>
+        <input id="apiBase" value="http://localhost:5000" style="border:none;background:transparent;outline:none;text-align:right"/>
+      </div>
+
+      <div class="input-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="admin@cpa.local" value="admin@cpa.local"/>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••" value="admin123"/>
+      </div>
+      <button id="loginBtn" class="btn" style="width:100%"><i class="fa fa-sign-in-alt"></i> Sign in</button>
+      <div id="loginError" class="error">Login failed. Check your credentials and API URL.</div>
+      <p class="small" style="margin-top:10px">Tip: Update <b>API_BASE</b> if your backend runs elsewhere.</p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD (shown after login) -->
+  <div id="app" class="dashboard">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <img src="https://i.imgur.com/WppkIEp.png" alt="Clear Pro Aligner">
+        <h2>Admin Portal</h2>
+      </div>
+      <ul class="sidebar-menu">
+        <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="#"><i class="fas fa-user-md"></i> Doctors <span class="menu-badge" id="badgeDoctors">0</span></a></li>
+        <li><a href="#"><i class="fas fa-folder-open"></i> Cases <span class="menu-badge" id="badgeCases">0</span></a></li>
+        <li><a href="#"><i class="fas fa-users"></i> Patients <span class="menu-badge" id="badgePatients">0</span></a></li>
+        <li><a href="#"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+        <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+        <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </div>
+
+    <div class="main-content">
+      <header>
+        <div class="header-left">
+          <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search...">
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="header-action">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notifBadge">0</span>
+          </div>
+          <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div class="user-info">
+              <div class="user-name" id="userEmail">Admin</div>
+              <div class="user-role">System Administrator</div>
+            </div>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Dashboard Overview</h1>
+          <div class="page-actions">
+            <button class="btn" id="exportBtn"><i class="fas fa-download"></i> Export Report</button>
+            <button class="btn" onclick="reloadAll()"><i class="fas fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i class="fas fa-user-md"></i></div>
+              <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> Live</div>
+            </div>
+            <div class="stat-value" id="statDoctors">0</div>
+            <div class="stat-label">Registered Doctors</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i class="fas fa-folder-open"></i></div>
+              <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> Live</div>
+            </div>
+            <div class="stat-value" id="statCases">0</div>
+            <div class="stat-label">Total Cases</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i class="fas fa-users"></i></div>
+              <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> Live</div>
+            </div>
+            <div class="stat-value" id="statPatients">0</div>
+            <div class="stat-label">Active Patients</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+              <div class="stat-trend trend-up"><i class="fas fa-arrow-up"></i> Live</div>
+            </div>
+            <div class="stat-value" id="statSuccess">0%</div>
+            <div class="stat-label">Success Rate</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-container">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Case Submissions Trend</div>
+            </div>
+            <div class="chart-container"><canvas id="casesChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header"><div class="chart-title">Case Status Distribution</div></div>
+            <div class="chart-container"><canvas id="statusChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="data-table">
+          <div class="table-header">
+            <div class="table-title">Recent Activity</div>
+          </div>
+          <table id="recent-activity">
+            <thead>
+              <tr><th>Date</th><th>User</th><th>Action</th><th>Details</th><th>Status</th></tr>
+            </thead>
+            <tbody id="activityBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// === Simple Frontend Auth + Data Wiring ===
+
+const els = {
+  loginPage: document.getElementById("loginPage"),
+  app: document.getElementById("app"),
+  apiBase: document.getElementById("apiBase"),
+  email: document.getElementById("email"),
+  password: document.getElementById("password"),
+  loginBtn: document.getElementById("loginBtn"),
+  loginError: document.getElementById("loginError"),
+  userEmail: document.getElementById("userEmail"),
+  badgeDoctors: document.getElementById("badgeDoctors"),
+  badgeCases: document.getElementById("badgeCases"),
+  badgePatients: document.getElementById("badgePatients"),
+  statDoctors: document.getElementById("statDoctors"),
+  statCases: document.getElementById("statCases"),
+  statPatients: document.getElementById("statPatients"),
+  statSuccess: document.getElementById("statSuccess"),
+  notifBadge: document.getElementById("notifBadge"),
+  activityBody: document.getElementById("activityBody"),
+  logoutBtn: document.getElementById("logoutBtn"),
+};
+
+function getToken(){ return localStorage.getItem("token"); }
+function setToken(t){ localStorage.setItem("token", t); }
+function clearToken(){ localStorage.removeItem("token"); }
+
+async function api(path, opts = {}){
+  const base = els.apiBase.value.trim().replace(/\/$/, "");
+  const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+  const token = getToken();
+  if (token) headers["Authorization"] = "Bearer " + token;
+  const res = await fetch(base + path, Object.assign({}, opts, { headers }));
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+async function doLogin(){
+  els.loginError.style.display = "none";
+  try {
+    const data = await api("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email: els.email.value, password: els.password.value })
+    });
+    setToken(data.token);
+    els.userEmail.textContent = data.user?.email || els.email.value;
+    showApp();
+    await reloadAll();
+  } catch (e) {
+    els.loginError.style.display = "block";
+  }
+}
+
+function showApp(){
+  els.loginPage.style.display = "none";
+  els.app.style.display = "flex";
+}
+
+function showLogin(){
+  els.app.style.display = "none";
+  els.loginPage.style.display = "grid";
+}
+
+els.loginBtn.addEventListener("click", doLogin);
+els.logoutBtn.addEventListener("click", (e)=>{ e.preventDefault(); clearToken(); showLogin(); });
+
+// Try silent auth on load
+(async function init(){
+  if (getToken()){
+    try {
+      // probe an authenticated endpoint
+      await api("/api/analytics/kpis");
+      showApp();
+      await reloadAll();
+      return;
+    } catch {}
+  }
+  showLogin();
+})();
+
+// === Data loading ===
+let casesChart, statusChart;
+
+async function loadKPIs(){
+  const k = await api("/api/analytics/kpis");
+  els.statDoctors.textContent = k.doctors ?? 0;
+  els.statCases.textContent = k.cases ?? 0;
+  els.statPatients.textContent = k.patients ?? 0;
+  els.statSuccess.textContent = (k.successRate ?? 0) + "%";
+  els.badgeDoctors.textContent = k.doctors ?? 0;
+  els.badgeCases.textContent = k.cases ?? 0;
+  els.badgePatients.textContent = k.patients ?? 0;
+
+  // status doughnut
+  const ctx2 = document.getElementById("statusChart").getContext("2d");
+  const statusData = [
+    k.statusBreakdown?.pending ?? 0,
+    k.statusBreakdown?.inReview ?? 0,
+    k.statusBreakdown?.approved ?? 0,
+    k.statusBreakdown?.rejected ?? 0
+  ];
+  if (statusChart) statusChart.destroy();
+  statusChart = new Chart(ctx2, {
+    type: "doughnut",
+    data: {
+      labels: ["Pending","In Review","Approved","Rejected"],
+      datasets: [{ data: statusData, backgroundColor: ["#f59e0b","#3b82f6","#10b981","#ef4444"], borderWidth:0 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:"bottom" } } }
+  });
+}
+
+async function loadTrends(){
+  const t = await api("/api/analytics/trends");
+  const ctx = document.getElementById("casesChart").getContext("2d");
+  if (casesChart) casesChart.destroy();
+  casesChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: t.labels.slice(0, 10), // Jan-Oct visually like original
+      datasets: [{
+        label: "Case Submissions",
+        data: t.data.slice(0, 10),
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37,99,235,0.1)",
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio:false,
+      plugins: { legend: { display:false } },
+      scales: { y: { beginAtZero: true, grid:{ drawBorder:false } }, x: { grid:{ display:false } } }
+    }
+  });
+}
+
+function asBadgeClass(status){
+  switch(status){
+    case "PENDING": return "status-pending";
+    case "IN_REVIEW": return "status-in-review";
+    case "APPROVED": return "status-approved";
+    case "REJECTED": return "status-rejected";
+    default: return "";
+  }
+}
+
+async function loadActivity(){
+  const items = await api("/api/analytics/recent-activity");
+  els.notifBadge.textContent = Math.min(items.length, 9);
+  const rows = items.map(it => {
+    const dt = new Date(it.date);
+    const dateStr = dt.toISOString().slice(0,16).replace("T"," ");
+    return `<tr>
+      <td>${dateStr}</td>
+      <td>${it.userName}</td>
+      <td>${it.action}</td>
+      <td>${it.details}</td>
+      <td><span class="status-badge ${asBadgeClass((it.status||'').toUpperCase())}">${it.status}</span></td>
+    </tr>`;
+  }).join("");
+  els.activityBody.innerHTML = rows || `<tr><td colspan="5">No activity yet.</td></tr>`;
+}
+
+async function reloadAll(){
+  await Promise.all([loadKPIs(), loadTrends(), loadActivity()]);
+}
+
+</script>
+</body>
+</html>

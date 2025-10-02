@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClearPro Health Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f9fafb;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      padding: 30px;
+      max-width: 480px;
+      width: 100%;
+    }
+    .status {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .ok { color: #10b981; }
+    .fail { color: #ef4444; }
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid #ddd;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      margin: 20px auto;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    small {
+      display: block;
+      color: #6b7280;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🩺 ClearPro Portal Health</h1>
+    <div id="frontendStatus" class="status">Checking frontend...</div>
+    <div id="apiStatus" class="status">Checking backend API...</div>
+    <div class="spinner" id="spinner"></div>
+    <small id="details">Waiting for checks...</small>
+  </div>
+
+  <script src="./config.js"></script>
+  <script>
+    const apiStatus = document.getElementById("apiStatus");
+    const frontendStatus = document.getElementById("frontendStatus");
+    const spinner = document.getElementById("spinner");
+    const details = document.getElementById("details");
+
+    // ✅ Frontend check (always true if this page loads)
+    frontendStatus.innerHTML = "✅ Frontend is up and serving files.";
+    frontendStatus.className = "status ok";
+
+    async function checkBackend() {
+      try {
+        const res = await fetch(`${window.API_BASE}/api/health`);
+        const data = await res.json();
+
+        if (res.ok && data.status === "ok") {
+          apiStatus.innerHTML = "✅ Backend API reachable.";
+          apiStatus.className = "status ok";
+          details.textContent = `Database: ${data.db || "connected"} | Uptime: ${data.uptime || "unknown"}`;
+        } else {
+          throw new Error("Invalid response");
+        }
+      } catch (e) {
+        apiStatus.innerHTML = "❌ Backend API not responding.";
+        apiStatus.className = "status fail";
+        details.textContent = "Unable to fetch /api/health. Check backend logs or proxy settings.";
+      } finally {
+        spinner.style.display = "none";
+      }
+    }
+
+    checkBackend();
+  </script>
+</body>
+</html>

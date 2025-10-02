@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Doctor Portal — Clear Pro Aligner</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#2563eb; --primary-dark:#1d4ed8; --border:#e5e7eb; --bg:#f8fafc; --text:#111827;
+      --muted:#6b7280; --danger:#ef4444; --success:#10b981;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#fff;color:var(--text)}
+    a{color:var(--primary);text-decoration:none}
+    button{cursor:pointer}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    .card{border:1px solid var(--border);border-radius:12px;padding:18px;background:#fff}
+    .btn{background:var(--primary);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:600}
+    .btn.secondary{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+    .btn.danger{background:var(--danger)}
+    .input, select, textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:14px}
+    .row{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .col-6{grid-column:span 6} .col-4{grid-column:span 4} .col-12{grid-column:span 12}
+    .title{font-size:22px;font-weight:700;margin:6px 0 14px}
+    .sub{color:var(--muted);font-size:14px;margin-top:-8px;margin-bottom:16px}
+    header{border-bottom:1px solid var(--border);padding:14px 0;background:#fff;position:sticky;top:0;z-index:10}
+    header .container{display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{height:36px}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap}
+    .tab{border:1px solid var(--border);padding:8px 12px;border-radius:999px;color:#111}
+    .tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .hidden{display:none !important}
+    .error{color:var(--danger);font-size:14px;margin-top:6px}
+    .pill{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid var(--border);font-size:12px;color:#374151}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid var(--border);text-align:left;padding:10px 8px;font-size:14px}
+    th{background:#f9fafb;color:#374151;font-weight:600}
+    .muted{color:var(--muted)}
+    @media(max-width:768px){ .col-6,.col-4{grid-column:span 12} .tabs{overflow:auto}}
+    /* Login */
+    .login-wrap{min-height:100vh;display:grid;place-items:center;background:linear-gradient(180deg,#f8fafc,#ffffff)}
+    .login-card{width:min(440px,92vw);border:1px solid var(--border);border-radius:14px;background:#fff;box-shadow:0 10px 30px rgba(0,0,0,.05);padding:22px}
+    .env{display:flex;align-items:center;justify-content:space-between;border:1px dashed var(--border);border-radius:10px;padding:8px 10px;font-size:12px;margin-bottom:10px}
+    .env input{border:none;width:60%;text-align:right}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN FIRST -->
+<div id="loginPage" class="login-wrap">
+  <div class="login-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <img src="https://i.imgur.com/WppkIEp.png" alt="CPA" style="height:36px;filter:grayscale(.1)"/>
+      <h1 style="font-size:18px;margin:0">Doctor Portal Login</h1>
+    </div>
+    <p class="sub">Sign in to submit cases and review your submissions.</p>
+    <div class="env">
+      <span>API_BASE</span>
+      <input id="apiBase" value="https://clearproaligner.com">
+    </div>
+    <div class="row">
+      <div class="col-12"><label>Email</label><input id="email" class="input" type="email" placeholder="doctor@example.com" value="admin@clearproaligner.com"></div>
+      <div class="col-12"><label>Password</label><input id="password" class="input" type="password" placeholder="••••••••" value="admin123"></div>
+      <div class="col-12"><button id="loginBtn" class="btn" style="width:100%"><i class="fa fa-sign-in-alt"></i>&nbsp;Sign in</button></div>
+      <div id="loginError" class="col-12 error hidden">Login failed. Check credentials or API URL.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DOCTOR PORTAL -->
+<header id="appHeader" class="hidden">
+  <div class="container">
+    <div class="brand">
+      <img src="https://i.imgur.com/WppkIEp.png" alt="CPA">
+      <strong>Doctor Portal</strong>
+      <span id="doctorEmail" class="pill"></span>
+    </div>
+    <div class="tabs">
+      <a class="tab active" data-tab="submitTab">Submit Case</a>
+      <a class="tab" data-tab="myCasesTab">My Cases</a>
+    </div>
+    <div>
+      <button id="logoutBtn" class="btn secondary"><i class="fa fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </div>
+</header>
+
+<main id="appMain" class="container hidden">
+  <!-- SUBMIT CASE -->
+  <section id="submitTab" class="card">
+    <div class="title">Submit a New Case</div>
+    <p class="sub">Fill patient details, case info, and upload files (STL, photos, X-rays). Files will be securely uploaded to the server.</p>
+
+    <form id="caseForm">
+      <div class="row">
+        <div class="col-6">
+          <label>Patient Name</label>
+          <input name="patientName" class="input" placeholder="John Doe" required>
+        </div>
+        <div class="col-6">
+          <label>Patient Email</label>
+          <input name="patientEmail" class="input" type="email" placeholder="john@example.com">
+        </div>
+        <div class="col-6">
+          <label>Patient Phone</label>
+          <input name="patientPhone" class="input" placeholder="+971 50 000 0000">
+        </div>
+        <div class="col-6">
+          <label>Case Type / Diagnosis</label>
+          <input name="caseType" class="input" placeholder="Crowding / Spacing / Overbite ...">
+        </div>
+        <div class="col-4">
+          <label>Complexity</label>
+          <select name="complexity" class="input">
+            <option value="">Select</option>
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+          </select>
+        </div>
+        <div class="col-4">
+          <label>Treatment Duration (months)</label>
+          <input name="treatmentDuration" class="input" type="number" min="1" max="60" placeholder="e.g. 12">
+        </div>
+        <div class="col-4">
+          <label>Previous Treatment</label>
+          <select name="previousTreatment" class="input">
+            <option value="">Select</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label>Notes</label>
+          <textarea name="notes" class="input" rows="4" placeholder="Add any relevant notes..."></textarea>
+        </div>
+
+        <div class="col-12"><hr style="border:none;border-top:1px solid var(--border);margin:8px 0 6px"></div>
+        <div class="col-4">
+          <label>STL Files</label>
+          <input name="stlFiles" type="file" class="input" multiple accept=".stl">
+          <div class="muted" style="font-size:12px;margin-top:6px">Allowed: .stl — multiple files supported</div>
+        </div>
+        <div class="col-4">
+          <label>Photos</label>
+          <input name="photos" type="file" class="input" multiple accept="image/*">
+        </div>
+        <div class="col-4">
+          <label>X-rays</label>
+          <input name="xrays" type="file" class="input" multiple accept="image/*,.dcm,application/dicom">
+        </div>
+
+        <div class="col-12" style="display:flex;gap:10px;align-items:center">
+          <button class="btn" type="submit"><i class="fa fa-paper-plane"></i>&nbsp;Submit Case</button>
+          <span id="caseSubmitStatus" class="muted"></span>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <!-- MY CASES -->
+  <section id="myCasesTab" class="card hidden">
+    <div class="title">My Cases</div>
+    <p class="sub">These are the cases you’ve submitted.</p>
+    <div class="card" style="padding:0">
+      <div style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Case ID</th>
+              <th>Patient</th>
+              <th>Submitted</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody id="casesBody">
+            <tr><td colspan="6" class="muted">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="caseDetail" class="card hidden" style="margin-top:16px">
+      <div class="title" style="font-size:18px">Case Details</div>
+      <div id="caseDetailBody" class="muted">Select a case to view details.</div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ====== config & helpers ======
+const els = {
+  loginPage: document.getElementById('loginPage'),
+  appHeader: document.getElementById('appHeader'),
+  appMain: document.getElementById('appMain'),
+  apiBase: document.getElementById('apiBase'),
+  email: document.getElementById('email'),
+  password: document.getElementById('password'),
+  loginBtn: document.getElementById('loginBtn'),
+  loginError: document.getElementById('loginError'),
+  logoutBtn: document.getElementById('logoutBtn'),
+  doctorEmail: document.getElementById('doctorEmail'),
+  tabs: document.querySelectorAll('.tab'),
+  submitTab: document.getElementById('submitTab'),
+  myCasesTab: document.getElementById('myCasesTab'),
+  caseForm: document.getElementById('caseForm'),
+  caseSubmitStatus: document.getElementById('caseSubmitStatus'),
+  casesBody: document.getElementById('casesBody'),
+  caseDetail: document.getElementById('caseDetail'),
+  caseDetailBody: document.getElementById('caseDetailBody'),
+};
+
+function getToken(){ return localStorage.getItem('doctor_token'); }
+function setToken(t){ localStorage.setItem('doctor_token', t); }
+function clearToken(){ localStorage.removeItem('doctor_token'); }
+
+function setActive(tabId){
+  els.tabs.forEach(t=> t.classList.toggle('active', t.dataset.tab===tabId));
+  [els.submitTab, els.myCasesTab].forEach(s => s.classList.add('hidden'));
+  document.getElementById(tabId).classList.remove('hidden');
+  if (tabId==='myCasesTab') loadMyCases().catch(()=>{});
+}
+
+// generic JSON API
+async function api(path, opts={}){
+  const base = els.apiBase.value.trim().replace(/\/$/, '');
+  const headers = Object.assign({}, opts.headers||{});
+  const token = getToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(base + path, Object.assign({}, opts, { headers }));
+  if (!res.ok) throw new Error(await res.text());
+  const contentType = res.headers.get('content-type')||'';
+  if (contentType.includes('application/json')) return res.json();
+  return res.text();
+}
+
+// ====== login & session ======
+async function doLogin(){
+  els.loginError.classList.add('hidden');
+  try{
+    const data = await api('/api/doctors/login', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify({ email: els.email.value, password: els.password.value })
+    });
+    setToken(data.token);
+    els.doctorEmail.textContent = data.doctor?.email || els.email.value;
+    showApp();
+    setActive('submitTab');
+  }catch(e){
+    els.loginError.classList.remove('hidden');
+  }
+}
+
+function showApp(){
+  els.loginPage.classList.add('hidden');
+  els.appHeader.classList.remove('hidden');
+  els.appMain.classList.remove('hidden');
+}
+
+function showLogin(){
+  els.appHeader.classList.add('hidden');
+  els.appMain.classList.add('hidden');
+  els.loginPage.classList.remove('hidden');
+}
+
+// try silent auth on load
+(async function init(){
+  if (getToken()){
+    try{
+      await api('/api/cases/my-cases');
+      showApp();
+      setActive('submitTab');
+      return;
+    }catch{ clearToken(); }
+  }
+  showLogin();
+})();
+
+els.loginBtn.addEventListener('click', doLogin);
+els.logoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); clearToken(); showLogin(); });
+
+// tabs
+els.tabs.forEach(t => t.addEventListener('click', (e)=>{
+  e.preventDefault();
+  setActive(t.dataset.tab);
+}));
+
+// ====== submit case (multipart) ======
+els.caseForm.addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  els.caseSubmitStatus.textContent = 'Uploading…';
+  els.caseSubmitStatus.style.color = '';
+  const fd = new FormData(els.caseForm);
+
+  for (const name of ['stlFiles','photos','xrays']){
+    const input = els.caseForm.querySelector(`input[name="${name}"]`);
+    if (input && input.files){
+      fd.delete(name);
+      for (const f of input.files) fd.append(name, f, f.name);
+    }
+  }
+
+  try{
+    const base = els.apiBase.value.trim().replace(/\/$/, '');
+    const token = getToken();
+    const res = await fetch(base + '/api/cases/submit', {
+      method:'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: fd
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    els.caseSubmitStatus.textContent = 'Submitted ✔ Case ID: ' + (data.caseId || '');
+    els.caseSubmitStatus.style.color = 'var(--success)';
+    els.caseForm.reset();
+  }catch(err){
+    els.caseSubmitStatus.textContent = 'Submit failed';
+    els.caseSubmitStatus.style.color = 'var(--danger)';
+  }
+});
+
+// ====== my cases ======
+async function loadMyCases(){
+  els.casesBody.innerHTML = `<tr><td colspan="6" class="muted">Loading…</td></tr>`;
+  const rows = await api('/api/cases/my-cases');
+  if (!rows.length){
+    els.casesBody.innerHTML = `<tr><td colspan="6" class="muted">No cases yet.</td></tr>`;
+    return;
+  }
+  els.casesBody.innerHTML = rows.map(r => {
+    const dt = new Date(r.submitted_at);
+    const ds = isNaN(dt) ? '' : dt.toISOString().slice(0,16).replace('T',' ');
+    return `<tr>
+      <td>${r.case_id}</td>
+      <td>${r.patient_name||''}</td>
+      <td>${ds}</td>
+      <td>${r.case_type||''}</td>
+      <td>${r.status}</td>
+      <td><button class="btn secondary" data-view="${r.case_id}">View</button></td>
+    </tr>`;
+  }).join('');
+
+  els.casesBody.querySelectorAll('button[data-view]').forEach(b => {
+    b.addEventListener('click', () => showCaseDetail(b.dataset.view));
+  });
+}
+
+async function showCaseDetail(code){
+  els.caseDetail.classList.remove('hidden');
+  els.caseDetailBody.innerHTML = 'Loading…';
+  const data = await api('/api/cases/' + encodeURIComponent(code));
+  const files = (data.files || []).map(f => `<li><a href="${f.url}" target="_blank">${f.original_name}</a> <span class="muted">(${f.mime_type}, ${((f.file_size||0)/1024).toFixed(1)} KB)</span></li>`).join('') || '<li class="muted">No files</li>';
+  els.caseDetailBody.innerHTML = `
+    <div class="row">
+      <div class="col-6"><strong>Case ID:</strong> ${data.case_id}</div>
+      <div class="col-6"><strong>Status:</strong> ${data.status}</div>
+      <div class="col-6"><strong>Patient:</strong> ${data.patient_name||''}</div>
+      <div class="col-6"><strong>Type:</strong> ${data.case_type||''}</div>
+      <div class="col-12"><strong>Files</strong><ul style="margin-top:6px;padding-left:18px">${files}</ul></div>
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>
