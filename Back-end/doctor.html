@@ -1,0 +1,321 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Pro Aligner - Doctor Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="login-section" class="login-container">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="https://i.imgur.com/WppkIEp.png" alt="Clear Pro Aligner">
+            </div>
+            <h2 class="login-title">Doctor Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <div id="login-error" class="form-group" style="color: var(--danger); display: none;"></div>
+                <button type="submit" class="btn" style="width: 100%;">Login</button>
+            </form>
+            <p style="text-align: center; margin-top: 20px; color: var(--gray);">
+                Demo: admin@clearproaligner.com / admin123
+            </p>
+        </div>
+    </div>
+
+    <!-- Doctor Portal (shown after login) -->
+    <div id="doctor-portal" style="display: none;">
+        <!-- Header -->
+        <header>
+            <div class="container">
+                <nav>
+                    <div class="logo">
+                        <img src="https://i.imgur.com/WppkIEp.png" alt="Clear Pro Aligner">
+                        <span style="margin-left: 10px; font-weight: 600; color: var(--primary);">Doctor Portal</span>
+                    </div>
+                    
+                    <div class="user-info">
+                        <div class="user-avatar" id="doctor-avatar">DR</div>
+                        <div>
+                            <div style="font-weight: 600;" id="doctor-name">Dr. Sarah Johnson</div>
+                            <div style="font-size: 0.8rem; color: var(--gray);">Dental Surgeon</div>
+                        </div>
+                        <a href="#" class="logout-btn" style="margin-left: 15px; color: var(--gray);">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="#"><i class="fas fa-plus-circle"></i> <span>New Case</span></a></li>
+                    <li><a href="#"><i class="fas fa-folder-open"></i> <span>My Cases</span></a></li>
+                    <li><a href="#"><i class="fas fa-calendar-alt"></i> <span>Appointments</span></a></li>
+                    <li><a href="#"><i class="fas fa-users"></i> <span>Patients</span></a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> <span>Reports</span></a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                    <li><a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="page-header">
+                    <h1 class="page-title">Submit New Case</h1>
+                    <div>
+                        <a href="#" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Cases</a>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-cases">0</h3>
+                            <p>Total Cases</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="pending-cases">0</h3>
+                            <p>Pending Review</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="approved-cases">0</h3>
+                            <p>Approved Cases</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>4.8</h3>
+                            <p>Average Rating</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case Submission Form -->
+                <div class="form-container">
+                    <form id="caseForm">
+                        <!-- Patient Information -->
+                        <div class="form-section">
+                            <h2 class="form-section-title"><i class="fas fa-user-injured"></i> Patient Information</h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Patient ID</label>
+                                    <input type="text" class="form-control" value="AUTO-GENERATED" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Full Name *</label>
+                                    <input type="text" id="patientName" class="form-control" placeholder="Enter patient's full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Date of Birth *</label>
+                                    <input type="date" id="dateOfBirth" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Gender *</label>
+                                    <select id="gender" class="form-control" required>
+                                        <option value="">Select gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="patientEmail" class="form-control" placeholder="patient@example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" id="patientPhone" class="form-control" placeholder="(123) 456-7890">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Case Details -->
+                        <div class="form-section">
+                            <h2 class="form-section-title"><i class="fas fa-teeth"></i> Case Details</h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Case Type *</label>
+                                    <select id="caseType" class="form-control" required>
+                                        <option value="">Select case type</option>
+                                        <option value="crowding">Crowding</option>
+                                        <option value="spacing">Spacing</option>
+                                        <option value="overbite">Overbite</option>
+                                        <option value="underbite">Underbite</option>
+                                        <option value="crossbite">Crossbite</option>
+                                        <option value="openbite">Open Bite</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Treatment Complexity *</label>
+                                    <select id="complexity" class="form-control" required>
+                                        <option value="">Select complexity</option>
+                                        <option value="simple">Simple</option>
+                                        <option value="moderate">Moderate</option>
+                                        <option value="complex">Complex</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Estimated Treatment Duration (months) *</label>
+                                    <input type="number" id="treatmentDuration" class="form-control" min="3" max="24" placeholder="e.g., 12" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Previous Orthodontic Treatment</label>
+                                    <select id="previousTreatment" class="form-control">
+                                        <option value="no">No</option>
+                                        <option value="yes">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Case Notes</label>
+                                <textarea id="notes" class="form-control" placeholder="Additional details about the case..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- File Uploads -->
+                        <div class="form-section">
+                            <h2 class="form-section-title"><i class="fas fa-file-upload"></i> File Uploads</h2>
+                            
+                            <!-- STL Files -->
+                            <div class="form-group">
+                                <label class="form-label">3D Scan Files (STL) *</label>
+                                <div class="file-upload" id="stlUpload">
+                                    <i class="fas fa-file-archive"></i>
+                                    <p>Drag & drop your STL files here or click to browse</p>
+                                    <p class="btn btn-secondary">Select Files</p>
+                                    <input type="file" id="stlInput" multiple accept=".stl" style="display: none;">
+                                </div>
+                                <div class="file-list" id="stlFileList"></div>
+                            </div>
+
+                            <!-- Patient Photos -->
+                            <div class="form-group">
+                                <label class="form-label">Patient Photos *</label>
+                                <div class="file-upload" id="photoUpload">
+                                    <i class="fas fa-images"></i>
+                                    <p>Drag & drop patient photos here or click to browse</p>
+                                    <p class="btn btn-secondary">Select Photos</p>
+                                    <input type="file" id="photoInput" multiple accept="image/*" style="display: none;">
+                                </div>
+                                <div class="file-list" id="photoFileList"></div>
+                            </div>
+
+                            <!-- X-Rays -->
+                            <div class="form-group">
+                                <label class="form-label">X-Ray Images</label>
+                                <div class="file-upload" id="xrayUpload">
+                                    <i class="fas fa-x-ray"></i>
+                                    <p>Drag & drop X-ray images here or click to browse</p>
+                                    <p class="btn btn-secondary">Select X-Rays</p>
+                                    <input type="file" id="xrayInput" multiple accept="image/*" style="display: none;">
+                                </div>
+                                <div class="file-list" id="xrayFileList"></div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Section -->
+                        <div class="form-section">
+                            <div style="display: flex; justify-content: flex-end; gap: 15px;">
+                                <button type="reset" class="btn btn-secondary">Clear Form</button>
+                                <button type="submit" class="btn">Submit Case</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Recent Cases -->
+                <div class="cases-table">
+                    <div class="table-header">
+                        <div class="table-title">Recent Cases</div>
+                        <div class="table-filters">
+                            <select class="filter-select">
+                                <option>All Status</option>
+                                <option>Pending</option>
+                                <option>In Review</option>
+                                <option>Approved</option>
+                            </select>
+                            <select class="filter-select">
+                                <option>Last 30 Days</option>
+                                <option>Last 90 Days</option>
+                                <option>This Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table id="cases-table">
+                        <thead>
+                            <tr>
+                                <th>Case ID</th>
+                                <th>Patient Name</th>
+                                <th>Date Submitted</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Cases will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Case Submitted Successfully</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--success); margin-bottom: 20px;"></i>
+                    <h3 style="margin-bottom: 10px;">Thank You!</h3>
+                    <p>Your case has been submitted successfully. Our team will review it and get back to you within 24-48 hours.</p>
+                    <p style="margin-top: 20px; font-weight: 600;">Case ID: <span id="submitted-case-id"></span></p>
+                    <button class="btn" style="margin-top: 30px;">View Case Details</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/app.js"></script>
+</body>
+</html>
+```
