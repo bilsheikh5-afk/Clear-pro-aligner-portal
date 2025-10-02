@@ -1,29 +1,51 @@
-/**
- * 🌐 ClearPro Portal Configuration
- * Automatically switches API endpoints based on environment (dev, staging, prod).
- */
+// config.js
 
-(function () {
-  // Default to production
-  let API_BASE = "https://clearproaligner.com";
+// ✅ Use API_BASE from Render environment variable if available, else fallback
+const API_BASE =
+  window?.__ENV__?.API_BASE ||
+  "https://clear-pro-aligner-portal2.onrender.com";
 
-  // Detect environment from hostname
-  const host = window.location.hostname;
+// 📡 Define all main backend endpoints
+const API_ENDPOINTS = {
+  // 🔐 Authentication
+  login: `${API_BASE}/api/auth/login`,
+  register: `${API_BASE}/api/auth/register`,
+  logout: `${API_BASE}/api/auth/logout`,
 
-  if (host === "localhost" || host === "127.0.0.1") {
-    // 🧪 Local development
-    API_BASE = "http://localhost:5000";
-  } else if (host.includes("staging")) {
-    // 🧪 Staging environment (e.g., staging.portal.clearproaligner.com)
-    API_BASE = "https://staging.clearproaligner.com";
-  } else if (host.includes("dev")) {
-    // 👨‍💻 Dev environment (optional)
-    API_BASE = "https://dev.clearproaligner.com";
-  }
-  // else: production stays as default
+  // 👤 User management
+  users: `${API_BASE}/api/users`,
+  userById: (id) => `${API_BASE}/api/users/${id}`,
 
-  // Expose globally
-  window.API_BASE = API_BASE;
+  // 🩺 Doctor management
+  doctors: `${API_BASE}/api/doctors`,
+  doctorById: (id) => `${API_BASE}/api/doctors/${id}`,
 
-  console.log("[ClearPro Portal] Using API:", API_BASE);
-})();
+  // 📅 Appointments
+  appointments: `${API_BASE}/api/appointments`,
+  appointmentById: (id) => `${API_BASE}/api/appointments/${id}`,
+
+  // 📁 File upload & media
+  upload: `${API_BASE}/api/files/upload`,
+
+  // ⚙️ Settings
+  settings: `${API_BASE}/api/settings`,
+
+  // 📊 Dashboard
+  dashboard: `${API_BASE}/api/dashboard`,
+};
+
+// 🌍 Export config globally
+window.config = {
+  API_BASE,
+  API_ENDPOINTS
+};
+
+// ✅ Debug log (optional)
+console.log("✅ Using API Base URL:", API_BASE);
+
+000
+
+
+
+
+
