@@ -1,0 +1,16 @@
+{
+  "name": "clearpro-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Clear Pro Aligner Portal",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve .",
+    "build": "echo 'No build step needed for static site'"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
