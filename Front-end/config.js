@@ -3,7 +3,7 @@
 // ✅ Use API_BASE from Render environment variable if available, else fallback
 const API_BASE =
   window?.__ENV__?.API_BASE ||
-  "https://clear-pro-aligner-portal2.onrender.com";
+  "https://clear-pro-aligner-portal10.onrender.com";
 
 // 📡 Define all main backend endpoints
 const API_ENDPOINTS = {
