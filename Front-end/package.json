@@ -1,15 +1,16 @@
 {
   "name": "clearpro-frontend",
   "version": "1.0.0",
-  "scripts": {
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
-    "start": "serve -s build -l 3000"
-  },
   "dependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-scripts": "5.0.1",
     "react-router-dom": "^6.0.0",
     "serve": "^14.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "serve": "serve -s build -l 3000"
   }
 }
